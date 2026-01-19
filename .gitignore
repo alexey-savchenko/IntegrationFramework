@@ -1,8 +1,61 @@
-.DS_Store
-/.build
-/Packages
-xcuserdata/
+# Xcode
+#
+# gitignore contributors: add more FIFO patterns
+
+## Build generated
+build/
 DerivedData/
-.swiftpm/configuration/registries.json
-.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
-.netrc
+
+## Various settings
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+
+## Other
+*.tmp
+*.moved-aside
+*.xcuserstate
+
+## Obj-C/Swift specific
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+#
+# Add this line if you want to avoid checking in source code from RFCs.
+# .build/
+
+# Xcode patches
+*.orig
+*.rej
+
+# App Store Connect
+*.itmsp
+
+# Apple application specific
+#
+.DS_Store
+*.swp
+*.lock
+profile
+
+# Swift PM
+.build/
+.swiftpm/
+Packages/
+Package.resolved
+
+# Cursor
+.cursor/
