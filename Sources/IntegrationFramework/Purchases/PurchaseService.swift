@@ -2,7 +2,7 @@ import Foundation
 import RevenueCat
 import Combine
 
-protocol PurchaseServiceProtocol: Sendable {
+public protocol PurchaseServiceProtocol: Sendable {
     var isSubscribed: Bool { get }
     var isSubscribedSubject: AnyPublisher<Bool, Never> { get }
     func start(completion: @escaping (@Sendable () -> Void))
