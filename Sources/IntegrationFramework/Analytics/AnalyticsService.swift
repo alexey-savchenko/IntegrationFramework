@@ -7,6 +7,7 @@ public enum Event: Sendable {
     case paywallCTAClick
     case paywallCloseClick
     case paywallPopUpCloseClick
+    case silentRsocSponsoredPageVisible
 }
 
 public protocol AnalyticsServiceProtocol {
@@ -25,6 +26,8 @@ final class AnalyticsService: AnalyticsServiceProtocol {
         var url = URL(string: "")
         
         switch event {
+        case .silentRsocSponsoredPageVisible:
+            url = config.silentRsocSponsoredPageVisible.flatMap(URL.init(string:))
         case .paywallPopUpCloseClick:
             url = config.paymentPopupCrossClick.flatMap(URL.init(string:))
         case .paywallCloseClick:
