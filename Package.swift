@@ -5,19 +5,18 @@ import PackageDescription
 
 let package = Package(
     name: "IntegrationFramework",
-    products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
-        .library(
-            name: "IntegrationFramework",
-            targets: ["IntegrationFramework"]
-        ),
+    platforms: [.iOS(.v17)],
+    products: [.library(
+        name: "IntegrationFramework",
+        targets: ["IntegrationFramework"]
+    )],
+    dependencies: [
+        .package(url: "https://github.com/RevenueCat/purchases-ios.git", exact: .init(5, 38, 2)),
     ],
-    targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
-        .target(
-            name: "IntegrationFramework"
-        ),
-
-    ]
+    targets: [.target(
+        name: "IntegrationFramework",
+        dependencies: [
+            .product(name: "RevenueCat", package: "purchases-ios"),
+        ]
+    )]
 )
