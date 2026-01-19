@@ -1,20 +1,34 @@
 import Foundation
 
+/// Internal API definition for configuration endpoints.
+///
+/// Provides URL request construction with automatic device identification.
 enum ConfigAPI {
+    /// Fetch configuration endpoint.
     case getConfig
     
+    /// Base URL from IntegrationFramework configuration.
     var baseURL: URL {
         return URL(string: IntegrationFramework.shared.baseURL)!
     }
     
+    /// API path from IntegrationFramework configuration.
     var path: String {
         return IntegrationFramework.shared.path
     }
     
+    /// HTTP method (always GET for config endpoints).
     var method: String {
         return "GET"
     }
     
+    /// Constructs a URL request with device parameters.
+    ///
+    /// Automatically includes:
+    /// - `device_id`: Persistent device identifier (UUID)
+    /// - `device_type`: Device model identifier
+    ///
+    /// - Returns: A configured `URLRequest` ready to execute.
     func asURLRequest() -> URLRequest {
         let url = baseURL.appendingPathComponent(path)
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
@@ -32,11 +46,19 @@ enum ConfigAPI {
     }
 }
 
+/// Extension providing device identification utilities.
 extension ConfigAPI {
+    /// UserDefaults key for storing the persistent device ID.
     private var deviceIDKey: String {
         "persistent_device_id"
     }
     
+    /// Persistent device identifier.
+    ///
+    /// Generates a UUID on first access and stores it in UserDefaults
+    /// for consistent device identification across app launches.
+    ///
+    /// - Returns: A UUID string unique to this device/installation.
     var persistentDeviceID: String {
         if let existingID = UserDefaults.standard.string(forKey: deviceIDKey) {
             return existingID
@@ -48,6 +70,11 @@ extension ConfigAPI {
         return newID
     }
     
+    /// Device model identifier.
+    ///
+    /// Retrieves the hardware model identifier using the `uname` system call.
+    ///
+    /// - Returns: The device model string (e.g., "iPhone14,2") or "Unknown" if unavailable.
     var deviceModel: String {
         var systemInfo = utsname()
         uname(&systemInfo)
