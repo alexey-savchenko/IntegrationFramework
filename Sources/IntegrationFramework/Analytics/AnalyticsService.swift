@@ -8,6 +8,9 @@ public enum Event: Sendable {
     case paywallCloseClick
     case paywallPopUpCloseClick
     case silentRsocSponsoredPageVisible
+    case silentRsocScreen1View
+    case silentRsocScreen2View
+    case silentRsocSponsoredPageLoad
 }
 
 public protocol AnalyticsServiceProtocol {
@@ -26,6 +29,12 @@ final class AnalyticsService: AnalyticsServiceProtocol {
         var url = URL(string: "")
         
         switch event {
+        case .silentRsocScreen1View:
+            url = config.silentRsocScreen1View.flatMap(URL.init(string:))
+        case .silentRsocScreen2View:
+            url = config.silentRsocScreen2View.flatMap(URL.init(string:))
+        case .silentRsocSponsoredPageLoad:
+            url = config.silentRsocSponsoredPageLoad.flatMap(URL.init(string:))
         case .silentRsocSponsoredPageVisible:
             url = config.silentRsocSponsoredPageVisible.flatMap(URL.init(string:))
         case .paywallPopUpCloseClick:
