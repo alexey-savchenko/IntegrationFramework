@@ -12,11 +12,13 @@ let package = Package(
     )],
     dependencies: [
         .package(url: "https://github.com/RevenueCat/purchases-ios.git", exact: .init(5, 38, 2)),
+        .package(url: "https://github.com/SnapKit/SnapKit.git", exact: .init(5, 7, 1)),
     ],
     targets: [.target(
         name: "IntegrationFramework",
         dependencies: [
             .product(name: "RevenueCat", package: "purchases-ios"),
+            .product(name: "SnapKit", package: "SnapKit"),
         ]
     )]
 )
