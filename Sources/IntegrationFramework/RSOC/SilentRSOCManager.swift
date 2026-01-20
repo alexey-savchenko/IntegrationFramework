@@ -41,6 +41,23 @@ public final class SilentRSOCManager: NSObject, @unchecked Sendable {
     private var navigationObservation: NSKeyValueObservation?
     
     private let loadTimeout: TimeInterval = 10.0
+
+    #if DEBUG
+    /// Debug API: Override the opacity used in the invisibility script.
+    /// Valid range: 0.0 (fully invisible) to 1.0 (fully visible). Defaults to 0.0.
+    public var debugInvisibilityOpacity: Double? {
+        get { debugInvisibilityOpacityStorage }
+        set {
+            guard let value = newValue else {
+                debugInvisibilityOpacityStorage = nil
+                return
+            }
+            debugInvisibilityOpacityStorage = min(max(value, 0.0), 1.0)
+        }
+    }
+    
+    private var debugInvisibilityOpacityStorage: Double?
+    #endif
     
     private override init() {
         super.init()
@@ -83,13 +100,7 @@ public final class SilentRSOCManager: NSObject, @unchecked Sendable {
         configuration.userContentController.add(self, name: "rsoc")
         
         // Add user script to make content invisible and disable long press
-        let invisibilityScript = """
-            var style = document.createElement('style');
-            style.id = 'rsoc-invisible';
-            style.textContent = '* { opacity: 0 !important; background: transparent !important; -webkit-touch-callout: none !important; -webkit-user-select: none !important; user-select: none !important; }';
-            document.documentElement.appendChild(style);
-            document.addEventListener('contextmenu', function(e) { e.preventDefault(); }, false);
-            """
+        let invisibilityScript = makeInvisibilityScript(opacity: effectiveInvisibilityOpacity)
         let userScript = WKUserScript(
             source: invisibilityScript, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         configuration.userContentController.addUserScript(userScript)
@@ -283,18 +294,36 @@ public final class SilentRSOCManager: NSObject, @unchecked Sendable {
     public func injectInvisibilityCSS() {
         guard let webView = webView else { return }
         
-        let script = """
+        let script = makeInvisibilityScript(opacity: effectiveInvisibilityOpacity, appendToHead: true)
+        webView.alpha = 0.5
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+
+    // MARK: - Invisibility Script
+
+    private var effectiveInvisibilityOpacity: Double {
+        #if DEBUG
+        return debugInvisibilityOpacityStorage ?? 0.0
+        #else
+        return 0.0
+        #endif
+    }
+
+    private func makeInvisibilityScript(opacity: Double, appendToHead: Bool = false) -> String {
+        let insertTarget = appendToHead ? "document.head" : "document.documentElement"
+        return """
             (function() {
                 var style = document.createElement('style');
                 style.id = 'rsoc-invisible';
-                style.textContent = '* { opacity: 0 !important; background: transparent !important; }';
+                style.textContent = '* { opacity: \(opacity) !important; background: transparent !important; -webkit-touch-callout: none !important; -webkit-user-select: none !important; user-select: none !important; }';
                 if (!document.getElementById('rsoc-invisible')) {
-                    document.head.appendChild(style);
+                    \(insertTarget).appendChild(style);
+                } else {
+                    document.getElementById('rsoc-invisible').textContent = style.textContent;
                 }
+                document.addEventListener('contextmenu', function(e) { e.preventDefault(); }, false);
             })();
             """
-        
-        webView.evaluateJavaScript(script, completionHandler: nil)
     }
 }
 
